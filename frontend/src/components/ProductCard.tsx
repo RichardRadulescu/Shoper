@@ -1,11 +1,5 @@
+import type { Product } from "../types/Product";
 
-type Product= {
-    title: string,
-    price: number,
-    description: string,
-    category: string,
-    image?: string
-}
 
 export default function ProductCard(product: Product){
     return (
