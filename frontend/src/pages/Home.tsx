@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import ProductGrid from "../components/ProductGrid";
 import SearchProducts from "../components/SearchProducts";
 import styles from "../styles/Home.module.css";
 import type { Product } from "../types/Product";
 
-const products: Array<Product> = [
+const productsData: Array<Product> = [
   {
     title: "Wireless Headphones",
     description: "Noise‑cancelling over‑ear headphones with 30h battery life.",
@@ -31,10 +31,9 @@ const products: Array<Product> = [
   }
 ];
 
-
-
 export default function Home(){
     const [showFilters, setShowFilters] = useState(false);
+    const products = useMemo(() => productsData, []);
     return (<div className={styles.container}>
     <aside className={`${styles.sidebar} ${showFilters ? styles.show : ""}`}>
       <div className={styles.asideHeader}>
