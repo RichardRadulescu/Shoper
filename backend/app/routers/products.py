@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Response, HTTPException
+from fastapi import APIRouter, Response, HTTPException, Depends, Query
 from app.models.product import Product
 import httpx
+from app.services.searchProducts import searchProductsService, ProductSearchParams
+from typing import Optional, List
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -10,10 +12,10 @@ async def getAllProducts():
     return products
 
 @router.post("/fetch/{count}")
-async def addFromExternalAPI(count: int):
-    url= ""
+async def addFromExternalAPI(count: int= 1):
+    url= 'https://fakestoreapi.com/products'
 
-    async with httpx.AsyncClient as client:
+    async with httpx.AsyncClient() as client:
         response = await client.get(url)
     
     if response.status_code != 200:
@@ -21,16 +23,21 @@ async def addFromExternalAPI(count: int):
     
     external_products= response.json()
 
-    inserted= []
-
+    inserted= 0
+    
     for p in external_products:
-        product = Product( name=p["name"], price=p["price"], 
-                           description=p.get("description", "") 
+        print(p.get("category","non"))
+        product = Product( title=p["title"], price=p["price"], 
+                           description=p.get("description", ""),
+                           categories= [p.get("category","")],
+                           image= p.get("image", "")
                            ) 
         await product.insert() 
-        inserted.append(product)
+        inserted+=1
+        if inserted>= count:
+            break
 
-    return {"inserted": len(inserted)}
+    return {"requested": count, "inserted": inserted}
 
 
 
@@ -42,4 +49,28 @@ async def removeProduct(product_id: str):
     
     await product.delete()
     return {"message": "Product Removed"}
-    
+
+
+def get_search_params(
+    query: Optional[str] = Query(None),
+    orderBy: Optional[int] = Query(1),
+    minPrice: Optional[float] = Query(None),
+    maxPrice: Optional[float] = Query(None),
+    categories: Optional[List[str]] = Query(
+        None,
+        description="One or more categories to filter by. Repeat the parameter or supply a comma-separated list (e.g. ?categories=foo&categories=bar or ?categories=foo,bar).",
+    ),
+) -> ProductSearchParams:
+    """Construct ``ProductSearchParams`` from explicit query params."""
+    return ProductSearchParams(
+        query=query,
+        orderBy=orderBy,
+        minPrice=minPrice,
+        maxPrice=maxPrice,
+        categories=categories,
+    )
+
+
+@router.get("/search")
+async def searchProducts(params: ProductSearchParams = Depends(get_search_params)):
+    return await searchProductsService(params)
