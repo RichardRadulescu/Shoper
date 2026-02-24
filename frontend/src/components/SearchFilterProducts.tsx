@@ -1,27 +1,27 @@
 import { useSearchParams } from "react-router-dom";
-import { useRef, useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import styles from "../styles/SearchProducts.module.css";
+import { SearchInput } from "./SearchInputProducts";
 
-export default function SearchProducts() {
+export default function SearchFilterProducts() {
   const [params, setParams] = useSearchParams();
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [query, setQuery] = useState("");
-  const categories = params.get("category")?.split(",") ?? [];
+  const [text, setText] = useState(() => params.get("query") ?? "");
 
-  // Initialize query from URL only once on mount
+  // keep the input in sync if the query param is updated from outside
   useEffect(() => {
-    setQuery(params.get("query") ?? "");
-  }, []);  // Empty dependency array—only run once
+    setText(params.get("query") ?? "");
+  }, [params]);
 
-    const sort = params.get("sort") ?? "alphaAsc";
-    const min = params.get("min");
-    const max = params.get("max");
+  const categories = params.get("category")?.split(",") ?? [];
+  const sort = params.get("sort") ?? "alphaAsc";
+  const min = params.get("min");
+  const max = params.get("max");
 
     function update(key: string, value: string | null) {
-         const next = new URLSearchParams(params);
-         if (value === null || value === "") next.delete(key);
-         else next.set(key, value);
-         setParams(next);
+      const next = new URLSearchParams(params);
+      if (value === null || value === "") next.delete(key);
+      else next.set(key, value);
+      setParams(next);
     }
 
     function toggleCategory(value: string) {
@@ -35,29 +35,23 @@ export default function SearchProducts() {
         toggleCategory(value);
     }
 
-    const updateQueryDebounced = useCallback((value: string) => {
-      setQuery(value); // Update local state immediately for input responsiveness
-      
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => {
-        setParams(prev => {
-          const next = new URLSearchParams(prev);
-          if (!value) next.delete("query");
-          else next.set("query", value);
-          return next;
-        });
-      }, 300);
-    }, [setParams]);
+    const submitSearch = useCallback(() => {
+      setParams((prev) => {
+        const p = new URLSearchParams(prev);
+        if (text) p.set("query", text);
+        else p.delete("query");
+        return p;
+      });
+    }, [text, setParams]);
 
+    
     return (
-        <form className={styles.searchForm} onSubmit={(e)=>e.preventDefault()}>
+        <form className={styles.searchForm} onSubmit={(e) => { e.preventDefault(); submitSearch(); }}>
       <label>
         Search:
-        <input
-          value={query}
-          onChange={(e) => {updateQueryDebounced(e.target.value)}}
-        />
+        <SearchInput initialValue={text} onSearch={setText}></SearchInput>
       </label>
+      <button type="submit">Search</button>
 
       <label>
         Sort:

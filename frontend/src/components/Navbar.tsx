@@ -29,14 +29,20 @@ export default function Navbar({ children }: PropsWithChildren) {
   const [showMenu, setShowMenu] = useState(false);
 
   const [params, setParams] = useSearchParams();
-  const [search, setSearch] = useState(params.get("query") ?? "");
+  const [search, setSearch] = useState(() => params.get("query") ?? "");
 
+  // reflect external changes to the query param (e.g. from filter pane)
   useEffect(() => {
+    setSearch(params.get("query") ?? "");
+  }, [params]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     const next = new URLSearchParams(params);
-    if (!search) next.delete("query");
-    else next.set("query", search);
+    if (search) next.set("query", search);
+    else next.delete("query");
     setParams(next);
-  }, [search, params, setParams]);
+  };
 
   return (
     <>
@@ -47,14 +53,15 @@ export default function Navbar({ children }: PropsWithChildren) {
           </a>
         </div>
 
-        <div className={styles.searchWrap}>
+        <form className={styles.searchWrap} onSubmit={handleSubmit}>
           <input
             className={styles.searchInput}
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-        </div>
+          <button type="submit">Go</button>
+        </form>
 
         <div className={styles.right}>
           <button onClick={() => setShowFavs((v) => !v)}>Favorites</button>
