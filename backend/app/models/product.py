@@ -1,11 +1,11 @@
 from beanie import Document
-from typing import Optional
+from typing import Optional, List
 
 class Product(Document):
     title: str
     price: float
     description: Optional[str]
-    category: Optional[str]
+    categories: Optional[List[str]]
     image: Optional[str]
 
     class Settings:
