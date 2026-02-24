@@ -1,10 +1,11 @@
 import type { Product } from "../types/Product";
+import styles from "../styles/ProductCard.module.css";
 
 
-export default function ProductCard(product: Product){
+export default function ProductCard({product}: {product: Product}){
     return (
-        <div>
-            <h1>{product.title}</h1>
+        <div className={styles.card}>
+            <h2 className={styles.title}>{product.title}</h2>
             <p>{product.description}</p>
             <p>PRICE: {product.price}</p>
             <p>Categories: {product.category}</p>

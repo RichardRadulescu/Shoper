@@ -1,0 +1,15 @@
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: var(--card-bg);
+    padding: 1rem;
+    border: 1px solid var(--text);
+    border-radius: 4px;
+}
+
+.loginForm label {
+    display: flex;
+    flex-direction: column;
+    color: var(--text);
+}

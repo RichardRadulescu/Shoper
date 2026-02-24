@@ -1,39 +1,35 @@
 import { useSearchParams } from "react-router-dom";
-import type { Product } from "../types/Product";
-
-type SortCriterion = "alphaTitleASC" | "alphaTitleDESC" | "priceASC" | "priceDESC"
-
-const sorters: Record<SortCriterion, (a: Product, b: Product) => number> = {
-    alphaTitleASC: (a, b) => a.title.localeCompare(b.title),
-    alphaTitleDESC: (a, b) => b.title.localeCompare(a.title),
-    priceASC: (a, b) => a.price - b.price,
-    priceDESC: (a, b) => b.price - a.price
-}
-
-function sortProducts(products: Array<Product>, criterion: SortCriterion): Array<Product> {
-    return [...products].sort(sorters[criterion])
-}
+import styles from "../styles/SearchProducts.module.css";
 
 export default function SearchProducts() {
-    const [params, setParams] = useSearchParams();
-    const query = params.get("query") ?? "";
+  const [params, setParams] = useSearchParams();
+  const categories = params.get("category")?.split(",") ?? [];
+
+  const query = params.get("query") ?? "";
     const sort = params.get("sort") ?? "alphaAsc";
     const min = params.get("min");
     const max = params.get("max");
-    const categories = params.get("category")?.split(",") ?? [];
-
 
     function update(key: string, value: string | null) {
-         const next = new URLSearchParams(params); 
-         if (value === null || value === "")
-             next.delete(key); 
-         else 
-            next.set(key, value); 
-        setParams(next); 
+         const next = new URLSearchParams(params);
+         if (value === null || value === "") next.delete(key);
+         else next.set(key, value);
+         setParams(next);
+    }
+
+    function toggleCategory(value: string) {
+        const next = categories.includes(value)
+          ? categories.filter((c) => c !== value)
+          : [...categories, value];
+        update("category", next.length ? next.join(",") : null);
+    }
+
+    function removeCategory(value: string) {
+        toggleCategory(value);
     }
 
     return (
-        <form className="search-form">
+        <form className={styles.searchForm} onSubmit={(e)=>e.preventDefault()}>
       <label>
         Search:
         <input
@@ -77,25 +73,45 @@ export default function SearchProducts() {
         />
       </label>
 
-      <label>
-        Categories:
-        <select
-          multiple
-          value={categories}
-          onChange={(e) =>
-            update(
-              "category",
-              Array.from(e.target.selectedOptions)
-                .map((o) => o.value)
-                .join(",")
-            )
-          }
-        >
-          <option value="electronics">Electronics</option>
-          <option value="books">Books</option>
-          <option value="clothing">Clothing</option>
-        </select>
-      </label>
+      <div className={styles.categoriesRow}>
+        <label className={styles.categoriesLabel}>Categories:</label>
+        <div className={styles.chips}>
+          {categories.map((c) => (
+            <span key={c} className={styles.chip}>
+              <span className={styles.chipText}>{c}</span>
+              <button
+                type="button"
+                aria-label={`Remove ${c}`}
+                className={styles.chipRemove}
+                onClick={() => removeCategory(c)}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* checkbox list for easy selection (vertical) */}
+      <div className={styles.categoryOptions}>
+        {[
+          "electronics",
+          "books",
+          "clothing",
+          "health",
+          "furniture",
+        ].map((cat) => (
+          <label key={cat} className={styles.categoryOption}>
+            <input
+              type="checkbox"
+              className={styles.categoryCheckbox}
+              checked={categories.includes(cat)}
+              onChange={() => toggleCategory(cat)}
+            />
+            <span className={styles.categoryLabelText}>{cat}</span>
+          </label>
+        ))}
+      </div>
     </form>
     )
 }

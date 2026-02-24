@@ -1,11 +1,20 @@
 :root {
+  /* typography defaults */
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
+  /* theme variables (light mode defaults) */
+  --bg: #ffffff;
+  --text: #213547;
+  --btn-bg: #f9f9f9;
+  --nav-bg: #ffffff;
+  --card-bg: #ffffff;
+  --primary: #646cff;
+
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: var(--text);
+  background-color: var(--bg);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,21 +22,32 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.dark {
+  /* dark theme overrides */
+  --bg: #242424;
+  --text: rgba(255, 255, 255, 0.87);
+  --btn-bg: #1a1a1a;
+  --nav-bg: #333333;
+  --card-bg: #2c2c2c;
+  --primary: #646cff;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #535bf2;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: var(--bg);
+  color: var(--text);
 }
 
 h1 {
@@ -42,26 +62,33 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--btn-bg);
+  color: var(--text);
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* keep media query to support OS-level preference when JS theme toggle is off  */
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    --bg: #ffffff;
+    --text: #213547;
+    --btn-bg: #f9f9f9;
   }
+
   a:hover {
     color: #747bff;
   }
+
   button {
     background-color: #f9f9f9;
   }

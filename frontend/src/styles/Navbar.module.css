@@ -1,0 +1,96 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: var(--nav-bg);
+    border-bottom: 1px solid var(--text);
+}
+
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text);
+    text-decoration: none;
+}
+
+.right>button {
+    margin-left: 0.5rem;
+}
+
+.searchWrap {
+    flex: 1 1 300px;
+    margin: 0 0.5rem;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 0.4rem 0rem;
+    border-radius: 4px;
+    border: 1px solid var(--text);
+    background: var(--card-bg);
+    color: var(--text);
+}
+
+.menuButton {
+    display: none;
+    background: var(--btn-bg);
+    border: 1px solid var(--text);
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+}
+
+.menuModal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 2000;
+}
+
+.menuActions {
+    background: var(--card-bg);
+    padding: 1rem;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.menuClose {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--btn-bg);
+    border: 1px solid var(--text);
+    padding: 0.4rem 0.6rem;
+}
+
+.modal {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--card-bg);
+    border: 1px solid var(--text);
+    padding: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+@media (max-width: 768px) {
+    .right {
+        display: none;
+    }
+
+    .menuButton {
+        display: inline-block;
+    }
+
+    .searchWrap {
+        display: none;
+    }
+}

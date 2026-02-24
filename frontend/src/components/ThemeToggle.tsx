@@ -4,6 +4,8 @@ import { toggleTheme } from "../slices/themeSlice";
 import { useEffect } from "react";
 
 
+import styles from "../styles/ThemeToggle.module.css";
+
 export default function ThemeToggle(){
     const dispatch= useDispatch<AppDispatch>();
     const mode =useSelector((state: RootState) => state.theme.mode)
@@ -13,7 +15,7 @@ export default function ThemeToggle(){
     },[mode])
 
     return(
-        <button onClick={ ()=> dispatch(toggleTheme())}>
+        <button className={styles.toggle} onClick={ ()=> dispatch(toggleTheme())}>
             Switch to {mode === "light" ? "dark" : "light"} mode
         </button>
     )
