@@ -1,11 +1,18 @@
 import { useSearchParams } from "react-router-dom";
+import { useRef, useCallback, useState, useEffect } from "react";
 import styles from "../styles/SearchProducts.module.css";
 
 export default function SearchProducts() {
   const [params, setParams] = useSearchParams();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [query, setQuery] = useState("");
   const categories = params.get("category")?.split(",") ?? [];
 
-  const query = params.get("query") ?? "";
+  // Initialize query from URL only once on mount
+  useEffect(() => {
+    setQuery(params.get("query") ?? "");
+  }, []);  // Empty dependency array—only run once
+
     const sort = params.get("sort") ?? "alphaAsc";
     const min = params.get("min");
     const max = params.get("max");
@@ -28,13 +35,27 @@ export default function SearchProducts() {
         toggleCategory(value);
     }
 
+    const updateQueryDebounced = useCallback((value: string) => {
+      setQuery(value); // Update local state immediately for input responsiveness
+      
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        setParams(prev => {
+          const next = new URLSearchParams(prev);
+          if (!value) next.delete("query");
+          else next.set("query", value);
+          return next;
+        });
+      }, 300);
+    }, [setParams]);
+
     return (
         <form className={styles.searchForm} onSubmit={(e)=>e.preventDefault()}>
       <label>
         Search:
         <input
           value={query}
-          onChange={(e) => update("query", e.target.value)}
+          onChange={(e) => {updateQueryDebounced(e.target.value)}}
         />
       </label>
 
