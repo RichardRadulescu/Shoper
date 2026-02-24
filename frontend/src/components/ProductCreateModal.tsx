@@ -1,9 +1,11 @@
 
 
+import styles from "../styles/ProductCreateModal.module.css";
+
 export default function ProductCreateModal(){
 
     return (
-        <form>
+        <form className={styles.form}>
             <label> Product Name:
                 <input name="name" type="text"></input>
             </label>

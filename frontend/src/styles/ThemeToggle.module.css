@@ -1,0 +1,7 @@
+.toggle {
+    background: var(--btn-bg);
+    color: var(--text);
+    border: 1px solid var(--text);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+}
