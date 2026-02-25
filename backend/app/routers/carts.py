@@ -1,9 +1,12 @@
 from fastapi import APIRouter
 from models.cart import CartItem
-from app.services.cart_service import (
+from app.services.cart_services import (
     get_cart_by_user_id,
     create_empty_cart,
-    add_item_to_cart
+    add_item_to_cart,
+    update_item_quantity,
+    remove_item_from_cart,
+    clear_cart
 )
 
 router = APIRouter(prefix="/cart", tags=["Cart"])
@@ -19,5 +22,19 @@ async def get_cart(user_id: str):
 
 @router.post("/{user_id}/add")
 async def add_to_cart(user_id: str, item: CartItem):
-    cart = await add_item_to_cart(user_id, item)
-    return cart
+    return await add_item_to_cart(user_id, item)
+
+
+@router.put("/{user_id}/update/{product_id}")
+async def update_quantity(user_id: str, product_id: str, quantity: int):
+    return await update_item_quantity(user_id, product_id, quantity)
+
+
+@router.delete("/{user_id}/remove/{product_id}")
+async def remove_item(user_id: str, product_id: str):
+    return await remove_item_from_cart(user_id, product_id)
+
+
+@router.delete("/{user_id}/clear")
+async def clear_user_cart(user_id: str):
+    return await clear_cart(user_id)
