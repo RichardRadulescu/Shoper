@@ -12,7 +12,7 @@ async def lifespan(app: FastAPI):
 	await create_admin_user()
 	yield 
 
-app = FastAPI(lifespan= lifespan)
+app = FastAPI(lifespan= lifespan, root_path="/api")
 
 app.add_middleware(CORSMiddleware,
 				   allow_origins=["*"], 

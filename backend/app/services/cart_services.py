@@ -1,5 +1,5 @@
 from typing import Optional
-from models.cart import ShoppingCart, CartItem
+from app.models.cart import ShoppingCart, CartItem
 
 
 async def get_cart_by_user_id(user_id: str) -> Optional[ShoppingCart]:

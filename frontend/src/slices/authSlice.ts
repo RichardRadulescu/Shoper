@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 export type Role = "visitor" | "user" | "admin";
 
 export const fetchCurrentUser = createAsyncThunk("auth/fetchCurrentUser", async () => {
-    const res = await fetch("/auth/me", { credentials: "include" });
+    const res = await fetch("/api/auth/me", { credentials: "include" });
     if (!res.ok) return { role: "visitor" } as { role: Role };
     return (await res.json()) as { id?: string; role: Role };
 });
@@ -17,7 +17,7 @@ export const registerUser = createAsyncThunk(
             password: payload.password,
         } as any);
 
-        const res = await fetch("/auth/register", {
+        const res = await fetch("/api/auth/register", {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },

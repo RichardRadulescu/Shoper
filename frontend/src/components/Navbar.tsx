@@ -1,10 +1,11 @@
 import { useState, type PropsWithChildren, useEffect, type SyntheticEvent } from "react";
 import useAuth from "../hooks/useAuth";
+import useFavorites from "../hooks/useFavorites";
+import useCart from "../hooks/useCart";
 import { useSearchParams } from "react-router-dom";
 import ProductListModal from "./ProductListModal";
 import ThemeToggle from "./ThemeToggle";
 import LoginModal from "./LoginModal";
-import type { Product } from "../types/Product";
 import styles from "../styles/Navbar.module.css";
 import RegisterModal from "./RegisterModal";
 
@@ -13,6 +14,8 @@ import RegisterModal from "./RegisterModal";
 export default function Navbar({ children }: PropsWithChildren) {
   // use `useAuth` for role and actions
   const { role, logout } = useAuth();
+  const { items: favItems } = useFavorites();
+  const { products: cartProducts, items: cartItems } = useCart();
   const isLoggedIn = role !== "visitor";
   const [showCart, setShowCart] = useState(false);
   const [showFavs, setShowFavs] = useState(false);
@@ -61,8 +64,8 @@ export default function Navbar({ children }: PropsWithChildren) {
         </form>
 
         <div className={styles.right}>
-          <button onClick={() => setShowFavs((v) => !v)}>Favorites</button>
-          <button onClick={() => setShowCart((v) => !v)}>Cart</button>
+          <button onClick={() => setShowFavs((v) => !v)}>Favorites ({favItems.length})</button>
+          <button onClick={() => setShowCart((v) => !v)}>Cart ({cartItems.length})</button>
           {role === "admin" && <button>Admin</button>}
           {!isLoggedIn ? (
             <>
@@ -94,9 +97,9 @@ export default function Navbar({ children }: PropsWithChildren) {
           >
             Close
           </button>
-          <div className={styles.menuActions}>
-            <button onClick={() => setShowFavs(true)}>Favorites</button>
-            <button onClick={() => setShowCart(true)}>Cart</button>
+            <div className={styles.menuActions}>
+            <button onClick={() => setShowFavs(true)}>Favorites ({favItems.length})</button>
+            <button onClick={() => setShowCart(true)}>Cart ({cartItems.length})</button>
             {role === "admin" && <button>Admin</button>}
             {!isLoggedIn ? (
               <button onClick={() => setShowLogin(true)}>Login</button>
@@ -110,7 +113,7 @@ export default function Navbar({ children }: PropsWithChildren) {
       {showCart && (
         <div className={styles.modal}>
           <h2>Cart</h2>
-          <ProductListModal products={products}></ProductListModal>
+          <ProductListModal products={cartProducts}></ProductListModal>
           <button onClick={() => setShowCart(false)}>Close</button>
         </div>
       )}
@@ -118,7 +121,7 @@ export default function Navbar({ children }: PropsWithChildren) {
       {showFavs && (
         <div className={styles.modal}>
           <h2>Favorites</h2>
-          <ProductListModal products={}></ProductListModal>
+          <ProductListModal products={favItems}></ProductListModal>
           <button onClick={() => setShowFavs(false)}>Close</button>
         </div>
       )}

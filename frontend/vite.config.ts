@@ -6,13 +6,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // Proxy API requests to the backend during development
-      "/auth": {
-        target: "http://localhost:8000",
+      '/api': {
+        target: 'http://localhost:8000',
         changeOrigin: true,
-        secure: false,
-      },
-      // Note: do NOT proxy `"/products"` because that conflicts with frontend routes
+        secure: false
+      }
     },
   },
 })

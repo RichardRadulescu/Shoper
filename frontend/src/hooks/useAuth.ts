@@ -11,14 +11,14 @@ export function useAuth() {
     const refresh = useCallback(() => dispatch(fetchCurrentUser() as any), [dispatch]);
 
     const logout = useCallback(async () => {
-        await fetch("/auth/logout", { method: "POST", credentials: "include" });
+        await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
         dispatch(clearRole());
     }, [dispatch]);
 
     const login = useCallback(
         async (email: string, password: string) => {
             console.log("attempting login", { email });
-            const res = await fetch("/auth/login", {
+            const res = await fetch("/api/auth/login", {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },

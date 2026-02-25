@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from models.cart import CartItem
+from app.models.cart import CartItem
 from app.services.cart_services import (
     get_cart_by_user_id,
     create_empty_cart,

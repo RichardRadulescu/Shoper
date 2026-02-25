@@ -18,14 +18,15 @@ export default function SearchFilterProducts() {
 
   // keep the input in sync if the query param is updated from outside
   useEffect(() => {
-    setText(params.get("query") ?? "");
+    const q = params.get("query") ?? "";
+    setText((prev) => (prev === q ? prev : q));
   }, [params]);
 
   useEffect(() => {
     let isMounted = true;
 
     async function loadCategories() {
-      const res = await fetch("http://localhost:8000/products/categories");
+      const res = await fetch("/api/products/categories");
       const data = await res.json();
       if (isMounted) setFilterCategories(data);
     }
