@@ -3,15 +3,13 @@ from app.models.user import User
 from app.hashing import verify_password
 from app.services.authentificateUser import create_access_token
 from app.services.authentificateUser import decode_access_token
+from app.hashing import hash_password
+
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-@router.post("/login")
-async def login(response: Response, email: str = Form(...), password: str = Form(...)):
-    user = await User.find_one(User.email == email)
-    if not user or not verify_password(password, user.hashed_password):
-        raise HTTPException(401, "Invalid credentials")
-    
+
+def add_cookie(response, user):
     token = create_access_token({"sub": str(user.id), "role": user.role})
 
     response.set_cookie(
@@ -22,7 +20,29 @@ async def login(response: Response, email: str = Form(...), password: str = Form
         secure=False
     )
 
+
+@router.post("/login")
+async def login(response: Response, email: str = Form(...), password: str = Form(...)):
+    user = await User.find_one(User.email == email)
+    if not user or not verify_password(password, user.hashed_password):
+        raise HTTPException(401, "Invalid credentials")
+    
+    add_cookie(response, user)
+
     return {"message": "Logged in"}
+
+
+@router.post("/register")
+async def register(response: Response, email: str = Form(...), name: str= Form(...), password: str = Form(...)):
+    hashed_psw= hash_password(password)
+    user = User(name= name, email= email, hashed_password= hashed_psw)
+    #dumb register need to check for duplicate usernames or smth...
+    await user.create()
+    
+    add_cookie(response, user) 
+
+    return {"message": "User Registered"}
+
 
 @router.post("/logout") 
 async def logout(response: Response): 

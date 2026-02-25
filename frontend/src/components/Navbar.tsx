@@ -6,21 +6,9 @@ import ThemeToggle from "./ThemeToggle";
 import LoginModal from "./LoginModal";
 import type { Product } from "../types/Product";
 import styles from "../styles/Navbar.module.css";
+import RegisterModal from "./RegisterModal";
 
-const products: Array<Product> = [
-  {
-    title: "Wireless Headphones",
-    description: "Noise‑cancelling over‑ear headphones with 30h battery life.",
-    price: 129.99,
-    category: "Electronics"
-  },
-  {
-    title: "Smart Water Bottle",
-    description: "Tracks hydration and glows to remind you to drink.",
-    price: 49.5,
-    category: "Health"
-  }
-];
+
 
 export default function Navbar({ children }: PropsWithChildren) {
   // use `useAuth` for role and actions
@@ -29,6 +17,7 @@ export default function Navbar({ children }: PropsWithChildren) {
   const [showCart, setShowCart] = useState(false);
   const [showFavs, setShowFavs] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
   const [params, setParams] = useSearchParams();
@@ -76,7 +65,10 @@ export default function Navbar({ children }: PropsWithChildren) {
           <button onClick={() => setShowCart((v) => !v)}>Cart</button>
           {role === "admin" && <button>Admin</button>}
           {!isLoggedIn ? (
+            <>
             <button onClick={() => setShowLogin((v) => !v)}>Login</button>
+            <button onClick={()=> setShowRegister((v)=> !v)}>Register</button>
+            </>
           ) : (
             <button onClick={logout}>Logout</button>
           )}
@@ -136,6 +128,15 @@ export default function Navbar({ children }: PropsWithChildren) {
           <LoginModal onClose={() => setShowLogin(false)} />
         </div>
       )}
+
+      {showRegister && (
+        <div className={styles.modal}>
+          <h2>Register</h2>
+          <RegisterModal onClose={()=> setShowRegister(false)}></RegisterModal>
+        </div>
+      )
+
+      }
     </>
   );
 }

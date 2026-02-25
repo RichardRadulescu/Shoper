@@ -8,6 +8,32 @@ export const fetchCurrentUser = createAsyncThunk("auth/fetchCurrentUser", async 
     return (await res.json()) as { id?: string; role: Role };
 });
 
+export const registerUser = createAsyncThunk(
+    "auth/registerUser",
+    async (payload: { email: string; username: string; password: string }, { dispatch }) => {
+        const body = new URLSearchParams({
+            email: payload.email,
+            name: payload.username,
+            password: payload.password,
+        } as any);
+
+        const res = await fetch("/auth/register", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body,
+        });
+
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(text || "Registration failed");
+        }
+
+        await dispatch(fetchCurrentUser() as any);
+        return true;
+    }
+);
+
 const authSlice = createSlice({
     name: "auth",
     initialState: { role: "visitor" as Role, id: null as string | null },
