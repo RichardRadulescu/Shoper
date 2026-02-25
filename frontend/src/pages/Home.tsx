@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import ProductGrid from "../components/ProductGrid";
 import SearchFilterProducts from "../components/SearchFilterProducts";
 import styles from "../styles/Home.module.css";
 import type { Product } from "../types/Product";
+import { useSearchParams } from "react-router-dom";
 
 const productsData: Array<Product> = [
   {
@@ -31,9 +32,39 @@ const productsData: Array<Product> = [
   }
 ];
 
+
+const THE_URL = "http://localhost:8000/products/search"
+
 export default function Home(){
     const [showFilters, setShowFilters] = useState(false);
-    const products = useMemo(() => productsData, []);
+    //const products = useMemo(() => productsData, []);
+    const [products, setProducts] = useState([])
+
+    const [params, setParams] = useSearchParams()
+    const query = params.get("query") ?? "";
+    const rawCategoriesParam = params.get("category") ?? "";
+    const categories = useMemo(
+      () => (rawCategoriesParam ? rawCategoriesParam.split(",").map((s) => s.trim()).filter(Boolean) : []),
+      [rawCategoriesParam]
+    );
+    const categoriesParam = useMemo(() => categories.join(","), [categories]);
+    const sort = params.get("sort") ?? "1";
+    const min = params.get("min");
+    const max = params.get("max");
+
+    useEffect(()=>{
+        const url = new URL(THE_URL); 
+        if (query) url.searchParams.set("query", query); 
+        if (categoriesParam) url.searchParams.set("categories", categoriesParam);
+        if (sort) url.searchParams.set("orderBy", sort);
+        if (min) url.searchParams.set("minPrice", min);
+        if (max) url.searchParams.set("maxPrice", max);
+
+        fetch(url).then(r=>r.json())
+            .then(setProducts)
+
+    }, [query, categoriesParam, sort, min, max])
+
     return (<div className={styles.container}>
     <aside className={`${styles.sidebar} ${showFilters ? styles.show : ""}`}>
       <div className={styles.asideHeader}>

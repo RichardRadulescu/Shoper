@@ -8,7 +8,9 @@ export default function ProductCard({product}: {product: Product}){
             <h2 className={styles.title}>{product.title}</h2>
             <p>{product.description}</p>
             <p>PRICE: {product.price}</p>
-            <p>Categories: {product.category}</p>
+            <p>Categories: {product.categories.map(c=> <p>{c}</p>)}
+
+            </p>
             <img src={product.image} />
         </div>
     )
