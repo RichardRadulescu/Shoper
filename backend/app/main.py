@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.db import init_db
 from contextlib import asynccontextmanager
 from app.utils import create_admin_user
-from app.routers import auth, products
+from app.routers import auth, products, carts
 
 
 @asynccontextmanager
@@ -22,6 +22,7 @@ app.add_middleware(CORSMiddleware,
 
 app.include_router(auth.router)
 app.include_router(products.router)
+app.include_router(carts.router)
 
 @app.get("/")
 def root():
