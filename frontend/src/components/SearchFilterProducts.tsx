@@ -6,12 +6,7 @@ import { SearchInput } from "./SearchInputProducts";
 export default function SearchFilterProducts() {
   const [params, setParams] = useSearchParams();
   const [text, setText] = useState(() => params.get("query") ?? "");
-
-  // keep the input in sync if the query param is updated from outside
-  useEffect(() => {
-    setText(params.get("query") ?? "");
-  }, [params]);
-
+  const [filterCategories, setFilterCategories]= useState([])
   // parse categories into a trimmed array (supports multi-select)
   const categories = (params.get("category") ?? "")
     .split(",")
@@ -20,6 +15,27 @@ export default function SearchFilterProducts() {
   const sort = params.get("sort") ?? "1";
   const min = params.get("min");
   const max = params.get("max");
+
+  // keep the input in sync if the query param is updated from outside
+  useEffect(() => {
+    setText(params.get("query") ?? "");
+  }, [params]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadCategories() {
+      const res = await fetch("http://localhost:8000/products/categories");
+      const data = await res.json();
+      if (isMounted) setFilterCategories(data);
+    }
+
+    loadCategories();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []); // empty deps → runs once
 
     function update(key: string, value: string | null) {
       const next = new URLSearchParams(params);
@@ -113,13 +129,7 @@ export default function SearchFilterProducts() {
 
       {/* checkbox list for easy selection (vertical) */}
       <div className={styles.categoryOptions}>
-        {[
-          "electronics",
-          "books",
-          "clothing",
-          "health",
-          "furniture",
-        ].map((cat) => (
+        {filterCategories.map((cat) => (
           <label key={cat} className={styles.categoryOption}>
             <input
               type="checkbox"

@@ -3,6 +3,7 @@ from app.models.product import Product
 import httpx
 from app.services.searchProducts import searchProductsService, ProductSearchParams
 from typing import Optional, List
+from app.services.getAllProductsCategories import get_all_categories
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -74,3 +75,7 @@ def get_search_params(
 @router.get("/search")
 async def searchProducts(params: ProductSearchParams = Depends(get_search_params)):
     return await searchProductsService(params)
+
+@router.get("/categories")
+async def getAllCategories():
+    return await get_all_categories()
