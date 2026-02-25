@@ -36,14 +36,14 @@ export const registerUser = createAsyncThunk(
 
 const authSlice = createSlice({
     name: "auth",
-    initialState: { role: "visitor" as Role, id: null as string | null },
+    initialState: { role: "visitor" as Role, id: "" },
     reducers: {
         setRole(state, action) {
             state.role = action.payload;
         },
         clearRole(state) {
             state.role = "visitor";
-            state.id = null;
+            state.id = "";
         },
     },
     extraReducers: (builder) => {

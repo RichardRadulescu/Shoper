@@ -1,30 +1,34 @@
 import { useState, type PropsWithChildren, useEffect, type SyntheticEvent } from "react";
 import useAuth from "../hooks/useAuth";
 import useFavorites from "../hooks/useFavorites";
-import useCart from "../hooks/useCart";
 import { useSearchParams } from "react-router-dom";
 import ProductListModal from "./ProductListModal";
 import ThemeToggle from "./ThemeToggle";
 import LoginModal from "./LoginModal";
 import styles from "../styles/Navbar.module.css";
 import RegisterModal from "./RegisterModal";
+import { useSelector } from "react-redux";
+import type { RootState } from "../store/store";
 
 
 
 export default function Navbar({ children }: PropsWithChildren) {
-  // use `useAuth` for role and actions
+  // AUTH
   const { role, logout } = useAuth();
-  const { items: favItems } = useFavorites();
-  const { products: cartProducts, items: cartItems } = useCart();
   const isLoggedIn = role !== "visitor";
+  // UI STATE
   const [showCart, setShowCart] = useState(false);
   const [showFavs, setShowFavs] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-
+  // URL 
   const [params, setParams] = useSearchParams();
   const [search, setSearch] = useState(() => params.get("query") ?? "");
+  // PRODUCT LISTS
+  const { items: favItems } = useFavorites();
+  const cartProducts=  useSelector((s: RootState)=> s.cart.products) 
+  const cartItems= useSelector((s: RootState)=> s.cart.items)
 
   // reflect external changes to the query param (e.g. from filter pane)
   useEffect(() => {
@@ -38,8 +42,6 @@ export default function Navbar({ children }: PropsWithChildren) {
     else next.delete("query");
     setParams(next);
   };
-
-  // initial fetch is handled globally by AuthInitializer
 
   return (
     <>

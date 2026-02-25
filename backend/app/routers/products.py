@@ -42,7 +42,6 @@ async def addFromExternalAPI(count: int= 1, user=Depends(require_role("admin")))
     return {"requested": count, "inserted": inserted}
 
 
-
 @router.delete("/{product_id}")
 async def removeProduct(product_id: str, user=Depends(require_role("admin"))):
     product = await Product.get(product_id)
@@ -86,3 +85,11 @@ async def searchProducts(params: ProductSearchParams = Depends(get_search_params
 @router.get("/categories")
 async def getAllCategories():
     return await get_all_categories()
+
+
+@router.get("/{product_id}")
+async def getProductById(product_id: str):
+    product = await Product.get(product_id)
+    if not product:
+        raise HTTPException(404, "Product not found")
+    return {"product": product} 
