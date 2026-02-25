@@ -20,17 +20,27 @@
 }
 
 .searchWrap {
-    flex: 1 1 300px;
+    flex: 1;
     margin: 0 0.5rem;
+    display: flex;
+    min-width: 0;
+    gap: 1rem;
+}
+
+.searchWrap label {
+    flex: 1;
+    min-width: 0;
+    display: flex;
 }
 
 .searchInput {
-    width: 100%;
     padding: 0.4rem 0rem;
     border-radius: 4px;
     border: 1px solid var(--text);
     background: var(--card-bg);
     color: var(--text);
+    flex: 1;
+    margin: 5px;
 }
 
 .menuButton {
@@ -81,7 +91,7 @@
     z-index: 1000;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 810px) {
     .right {
         display: none;
     }
@@ -89,7 +99,10 @@
     .menuButton {
         display: inline-block;
     }
+}
 
+/* keep the search visible on medium screens; hide only on small screens */
+@media (max-width: 480px) {
     .searchWrap {
         display: none;
     }

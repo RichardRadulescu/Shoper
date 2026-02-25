@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import ProductGrid from "../components/ProductGrid";
-import SearchProducts from "../components/SearchProducts";
+import SearchFilterProducts from "../components/SearchFilterProducts";
 import styles from "../styles/Home.module.css";
 import type { Product } from "../types/Product";
 
@@ -40,7 +40,7 @@ export default function Home(){
         <h3>Filters</h3>
         <button className={styles.closeButton} onClick={() => setShowFilters(false)}>Close</button>
       </div>
-      <SearchProducts/>
+      <SearchFilterProducts/>
     </aside>
     <main className={styles.main}>
         <button
