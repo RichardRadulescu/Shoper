@@ -118,6 +118,7 @@ export default function Navbar({ children }: PropsWithChildren) {
       {showFavs && (
         <div className={styles.modal}>
           <h2>Favorites</h2>
+          <ProductListModal products={}></ProductListModal>
           <button onClick={() => setShowFavs(false)}>Close</button>
         </div>
       )}
