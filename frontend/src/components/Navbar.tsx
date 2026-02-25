@@ -1,4 +1,4 @@
-import { useState, type PropsWithChildren, useEffect } from "react";
+import { useState, type PropsWithChildren, useEffect, type SyntheticEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductListModal from "./ProductListModal";
 import ThemeToggle from "./ThemeToggle";
@@ -36,7 +36,7 @@ export default function Navbar({ children }: PropsWithChildren) {
     setSearch(params.get("query") ?? "");
   }, [params]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
     const next = new URLSearchParams(params);
     if (search) next.set("query", search);
@@ -54,12 +54,15 @@ export default function Navbar({ children }: PropsWithChildren) {
         </div>
 
         <form className={styles.searchWrap} onSubmit={handleSubmit}>
+          <label>
           <input
             className={styles.searchInput}
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            name="searchProducts"
           />
+          </label>
           <button type="submit">Go</button>
         </form>
 
