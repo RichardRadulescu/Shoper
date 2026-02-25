@@ -12,8 +12,12 @@ export default function SearchFilterProducts() {
     setText(params.get("query") ?? "");
   }, [params]);
 
-  const categories = params.get("category")?.split(",") ?? [];
-  const sort = params.get("sort") ?? "alphaAsc";
+  // parse categories into a trimmed array (supports multi-select)
+  const categories = (params.get("category") ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const sort = params.get("sort") ?? "1";
   const min = params.get("min");
   const max = params.get("max");
 
@@ -46,7 +50,7 @@ export default function SearchFilterProducts() {
 
     
     return (
-        <form className={styles.searchForm} onSubmit={(e) => { e.preventDefault(); submitSearch(); }}>
+      <form className={styles.searchForm}  onSubmit={(e) => { e.preventDefault(); submitSearch(); }}>
       <label>
         Search:
         <SearchInput initialValue={text} onSearch={setText}></SearchInput>
@@ -59,10 +63,10 @@ export default function SearchFilterProducts() {
           value={sort}
           onChange={(e) => update("sort", e.target.value)}
         >
-          <option value="alphaAsc">A → Z</option>
-          <option value="alphaDesc">Z → A</option>
-          <option value="priceAsc">Price ↑</option>
-          <option value="priceDesc">Price ↓</option>
+          <option value="1">A → Z</option>
+          <option value="2">Z → A</option>
+          <option value="3">Price ↑</option>
+          <option value="4">Price ↓</option>
         </select>
       </label>
 
@@ -120,7 +124,7 @@ export default function SearchFilterProducts() {
             <input
               type="checkbox"
               className={styles.categoryCheckbox}
-              checked={categories.includes(cat)}
+              checked={categories?.includes(cat)}
               onChange={() => toggleCategory(cat)}
             />
             <span className={styles.categoryLabelText}>{cat}</span>

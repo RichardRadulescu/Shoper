@@ -1,5 +1,5 @@
 import { useState, type PropsWithChildren, useEffect, type SyntheticEvent } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Form, useSearchParams } from "react-router-dom";
 import ProductListModal from "./ProductListModal";
 import ThemeToggle from "./ThemeToggle";
 import type { Product } from "../types/Product";
@@ -52,19 +52,19 @@ export default function Navbar({ children }: PropsWithChildren) {
             MyShop
           </a>
         </div>
-
-        <form className={styles.searchWrap} onSubmit={handleSubmit}>
+        <Form method="get" action="/products" className={styles.searchWrap}>
           <label>
           <input
             className={styles.searchInput}
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            name="searchProducts"
+            name="query"
+            type="text"
           />
           </label>
           <button type="submit">Go</button>
-        </form>
+        </Form>
 
         <div className={styles.right}>
           <button onClick={() => setShowFavs((v) => !v)}>Favorites</button>
