@@ -52,15 +52,14 @@ export const removeFromCart = createAsyncThunk(
     }
 );
 
-
 export const fetchCart = createAsyncThunk(
     "cart/fetchCart",
-    async (userId: string, { rejectWithValue }) => {
+    async ({ userId }: { userId: string }, { rejectWithValue }) => {
         try {
             if (!userId) return { items: [], products: [] };
 
             // 1. Fetch cart
-            const cartRes = await fetch(`/cart/${userId}`, { credentials: "include" });
+            const cartRes = await fetch(`/api/cart/${userId}`, { credentials: "include" });
             if (!cartRes.ok) return { items: [], products: [] };
 
             const cart = await cartRes.json();
@@ -69,29 +68,31 @@ export const fetchCart = createAsyncThunk(
             // 2. Extract product IDs
             const productIds = items.map((it: any) => it.product_id);
 
-            // 3. Batch fetch each product individually
+            // 3. Fetch each product individually
             const productRequests = productIds.map((id: string) =>
-                fetch(`/products/${id}`, { credentials: "include" }).then((r) =>
-                    r.ok ? r.json() : null
-                )
+                fetch(`/api/products/${id}`, { credentials: "include" })
+                    .then((r) => (r.ok ? r.json() : null))
             );
 
             const productsRaw = await Promise.all(productRequests);
 
-            // 4. Normalize products (filter nulls)
+            // 4. Normalize products
             const products = productsRaw
                 .filter(Boolean)
-                .map((p: any) => ({
-                    ...p,
-                    id: p.id ?? p._id ?? p._id?.$oid,
-                }));
+                .map((entry: any) => {
+                    const p = entry.product ?? entry; // backend might return {product: {...}} or just {...}
 
-            return { items, products };
-        } catch (err) {
-            return rejectWithValue("Failed to fetch cart");
-        }
-    }
-);
+                    return {
+                        id: p.id ?? p._id ?? p._id?.$oid,
+                        title: p.title,
+                        price: p.price,
+                        image: p.image,
+                        description: p.description,
+                        categories: p.categories ?? [],
+                    };
+                }); return { items, products };
+        } catch (err) { return rejectWithValue("Failed to fetch cart"); }
+    });
 
 
 interface CartState {

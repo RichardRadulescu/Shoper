@@ -7,14 +7,16 @@ import ThemeToggle from "./ThemeToggle";
 import LoginModal from "./LoginModal";
 import styles from "../styles/Navbar.module.css";
 import RegisterModal from "./RegisterModal";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store/store";
+import { fetchCart } from "../slices/cartSlice";
+import { type AppDispatch } from "../store/store";
 
 
 
 export default function Navbar({ children }: PropsWithChildren) {
   // AUTH
-  const { role, logout } = useAuth();
+  const { role, id , logout } = useAuth();
   const isLoggedIn = role !== "visitor";
   // UI STATE
   const [showCart, setShowCart] = useState(false);
@@ -29,7 +31,15 @@ export default function Navbar({ children }: PropsWithChildren) {
   const { items: favItems } = useFavorites();
   const cartProducts=  useSelector((s: RootState)=> s.cart.products) 
   const cartItems= useSelector((s: RootState)=> s.cart.items)
+  const dispatch= useDispatch<AppDispatch>()
 
+  useEffect(()=>{
+    if (role === "user")
+     dispatch(fetchCart({userId: id}))
+  
+  },[id, role, dispatch] )
+
+  
   // reflect external changes to the query param (e.g. from filter pane)
   useEffect(() => {
     setSearch(params.get("query") ?? "");
