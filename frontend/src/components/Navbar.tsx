@@ -1,7 +1,9 @@
 import { useState, type PropsWithChildren, useEffect, type SyntheticEvent } from "react";
-import { Form, useSearchParams } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
+import { useSearchParams } from "react-router-dom";
 import ProductListModal from "./ProductListModal";
 import ThemeToggle from "./ThemeToggle";
+import LoginModal from "./LoginModal";
 import type { Product } from "../types/Product";
 import styles from "../styles/Navbar.module.css";
 
@@ -21,8 +23,9 @@ const products: Array<Product> = [
 ];
 
 export default function Navbar({ children }: PropsWithChildren) {
-  const role = "admin";
-  const isLoggedIn = true;
+  // use `useAuth` for role and actions
+  const { role, logout } = useAuth();
+  const isLoggedIn = role !== "visitor";
   const [showCart, setShowCart] = useState(false);
   const [showFavs, setShowFavs] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
@@ -44,6 +47,8 @@ export default function Navbar({ children }: PropsWithChildren) {
     setParams(next);
   };
 
+  // initial fetch is handled globally by AuthInitializer
+
   return (
     <>
       <nav className={styles.navbar}>
@@ -52,7 +57,7 @@ export default function Navbar({ children }: PropsWithChildren) {
             MyShop
           </a>
         </div>
-        <Form method="get" action="/products" className={styles.searchWrap}>
+        <form className={styles.searchWrap} onSubmit={handleSubmit}>
           <label>
           <input
             className={styles.searchInput}
@@ -64,7 +69,7 @@ export default function Navbar({ children }: PropsWithChildren) {
           />
           </label>
           <button type="submit">Go</button>
-        </Form>
+        </form>
 
         <div className={styles.right}>
           <button onClick={() => setShowFavs((v) => !v)}>Favorites</button>
@@ -73,7 +78,7 @@ export default function Navbar({ children }: PropsWithChildren) {
           {!isLoggedIn ? (
             <button onClick={() => setShowLogin((v) => !v)}>Login</button>
           ) : (
-            <button onClick={() => console.log("logout")}>Logout</button>
+            <button onClick={logout}>Logout</button>
           )}
           <ThemeToggle />
         </div>
@@ -128,7 +133,7 @@ export default function Navbar({ children }: PropsWithChildren) {
       {showLogin && (
         <div className={styles.modal}>
           <h2>Login</h2>
-          <button onClick={() => setShowLogin(false)}>Close</button>
+          <LoginModal onClose={() => setShowLogin(false)} />
         </div>
       )}
     </>
