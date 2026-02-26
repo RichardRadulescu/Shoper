@@ -73,7 +73,7 @@ export default function Navbar({ children }: PropsWithChildren) {
           />
           </label>
           <button type="submit">Go</button>
-        </form>
+        </Form>
 
         <div className={styles.right}>
           <button onClick={() => setShowFavs((v) => !v)}>Favorites ({favItems.length})</button>
