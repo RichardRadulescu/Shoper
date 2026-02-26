@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.db import init_db
 from contextlib import asynccontextmanager
 from app.utils import create_admin_user
-from app.routers import auth, products
+from app.routers import auth, products, carts
 
 
 @asynccontextmanager
@@ -12,7 +12,7 @@ async def lifespan(app: FastAPI):
 	await create_admin_user()
 	yield 
 
-app = FastAPI(lifespan= lifespan)
+app = FastAPI(lifespan= lifespan, root_path="/api")
 
 app.add_middleware(CORSMiddleware,
 				   allow_origins=["*"], 
@@ -22,6 +22,7 @@ app.add_middleware(CORSMiddleware,
 
 app.include_router(auth.router)
 app.include_router(products.router)
+app.include_router(carts.router)
 
 @app.get("/")
 def root():

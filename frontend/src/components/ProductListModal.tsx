@@ -6,7 +6,7 @@ export default function ProductListModal({products}: {products: Array<Product>})
 
     return (
         <ul className={styles.list}>
-            {products.map( p=> <li key={p.title}>
+            {products.map( (p,i)=> <li key={i }>
                 <p> {p.title}</p>
                 <p> {p.price}</p>
             </li>)}

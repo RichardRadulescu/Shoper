@@ -1,36 +1,45 @@
 import { useState, type PropsWithChildren, useEffect, type SyntheticEvent } from "react";
-import { Form, useSearchParams } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
+import useFavorites from "../hooks/useFavorites";
+import { useSearchParams } from "react-router-dom";
 import ProductListModal from "./ProductListModal";
 import ThemeToggle from "./ThemeToggle";
-import type { Product } from "../types/Product";
+import LoginModal from "./LoginModal";
 import styles from "../styles/Navbar.module.css";
+import RegisterModal from "./RegisterModal";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "../store/store";
+import { fetchCart } from "../slices/cartSlice";
+import { type AppDispatch } from "../store/store";
 
-const products: Array<Product> = [
-  {
-    title: "Wireless Headphones",
-    description: "Noise‑cancelling over‑ear headphones with 30h battery life.",
-    price: 129.99,
-    category: "Electronics"
-  },
-  {
-    title: "Smart Water Bottle",
-    description: "Tracks hydration and glows to remind you to drink.",
-    price: 49.5,
-    category: "Health"
-  }
-];
+
 
 export default function Navbar({ children }: PropsWithChildren) {
-  const role = "admin";
-  const isLoggedIn = true;
+  // AUTH
+  const { role, id , logout } = useAuth();
+  const isLoggedIn = role !== "visitor";
+  // UI STATE
   const [showCart, setShowCart] = useState(false);
   const [showFavs, setShowFavs] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-
+  // URL 
   const [params, setParams] = useSearchParams();
   const [search, setSearch] = useState(() => params.get("query") ?? "");
+  // PRODUCT LISTS
+  const { items: favItems } = useFavorites();
+  const cartProducts=  useSelector((s: RootState)=> s.cart.products) 
+  const cartItems= useSelector((s: RootState)=> s.cart.items)
+  const dispatch= useDispatch<AppDispatch>()
 
+  useEffect(()=>{
+    if (role === "user")
+     dispatch(fetchCart({userId: id}))
+  
+  },[id, role, dispatch] )
+
+  
   // reflect external changes to the query param (e.g. from filter pane)
   useEffect(() => {
     setSearch(params.get("query") ?? "");
@@ -52,7 +61,7 @@ export default function Navbar({ children }: PropsWithChildren) {
             MyShop
           </a>
         </div>
-        <Form method="get" action="/products" className={styles.searchWrap}>
+        <form className={styles.searchWrap} onSubmit={handleSubmit}>
           <label>
           <input
             className={styles.searchInput}
@@ -67,13 +76,16 @@ export default function Navbar({ children }: PropsWithChildren) {
         </Form>
 
         <div className={styles.right}>
-          <button onClick={() => setShowFavs((v) => !v)}>Favorites</button>
-          <button onClick={() => setShowCart((v) => !v)}>Cart</button>
+          <button onClick={() => setShowFavs((v) => !v)}>Favorites ({favItems.length})</button>
+          <button onClick={() => setShowCart((v) => !v)}>Cart ({cartItems.length})</button>
           {role === "admin" && <button>Admin</button>}
           {!isLoggedIn ? (
+            <>
             <button onClick={() => setShowLogin((v) => !v)}>Login</button>
+            <button onClick={()=> setShowRegister((v)=> !v)}>Register</button>
+            </>
           ) : (
-            <button onClick={() => console.log("logout")}>Logout</button>
+            <button onClick={logout}>Logout</button>
           )}
           <ThemeToggle />
         </div>
@@ -97,9 +109,9 @@ export default function Navbar({ children }: PropsWithChildren) {
           >
             Close
           </button>
-          <div className={styles.menuActions}>
-            <button onClick={() => setShowFavs(true)}>Favorites</button>
-            <button onClick={() => setShowCart(true)}>Cart</button>
+            <div className={styles.menuActions}>
+            <button onClick={() => setShowFavs(true)}>Favorites ({favItems.length})</button>
+            <button onClick={() => setShowCart(true)}>Cart ({cartItems.length})</button>
             {role === "admin" && <button>Admin</button>}
             {!isLoggedIn ? (
               <button onClick={() => setShowLogin(true)}>Login</button>
@@ -113,7 +125,7 @@ export default function Navbar({ children }: PropsWithChildren) {
       {showCart && (
         <div className={styles.modal}>
           <h2>Cart</h2>
-          <ProductListModal products={products}></ProductListModal>
+          <ProductListModal products={cartProducts}></ProductListModal>
           <button onClick={() => setShowCart(false)}>Close</button>
         </div>
       )}
@@ -121,6 +133,7 @@ export default function Navbar({ children }: PropsWithChildren) {
       {showFavs && (
         <div className={styles.modal}>
           <h2>Favorites</h2>
+          <ProductListModal products={favItems}></ProductListModal>
           <button onClick={() => setShowFavs(false)}>Close</button>
         </div>
       )}
@@ -128,9 +141,18 @@ export default function Navbar({ children }: PropsWithChildren) {
       {showLogin && (
         <div className={styles.modal}>
           <h2>Login</h2>
-          <button onClick={() => setShowLogin(false)}>Close</button>
+          <LoginModal onClose={() => setShowLogin(false)} />
         </div>
       )}
+
+      {showRegister && (
+        <div className={styles.modal}>
+          <h2>Register</h2>
+          <RegisterModal onClose={()=> setShowRegister(false)}></RegisterModal>
+        </div>
+      )
+
+      }
     </>
   );
 }

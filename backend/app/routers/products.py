@@ -2,7 +2,9 @@ from fastapi import APIRouter, Response, HTTPException, Depends, Query
 from app.models.product import Product
 import httpx
 from app.services.searchProducts import searchProductsService, ProductSearchParams
+from app.services.authentificateUser import require_role
 from typing import Optional, List
+from app.services.getAllProductsCategories import get_all_categories
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -12,7 +14,7 @@ async def getAllProducts():
     return products
 
 @router.post("/fetch/{count}")
-async def addFromExternalAPI(count: int= 1):
+async def addFromExternalAPI(count: int= 1, user=Depends(require_role("admin"))):
     url= 'https://fakestoreapi.com/products'
 
     async with httpx.AsyncClient() as client:
@@ -40,15 +42,20 @@ async def addFromExternalAPI(count: int= 1):
     return {"requested": count, "inserted": inserted}
 
 
-
 @router.delete("/{product_id}")
-async def removeProduct(product_id: str):
+async def removeProduct(product_id: str, user=Depends(require_role("admin"))):
     product = await Product.get(product_id)
     if not product:
         raise HTTPException(404, "Product not found")
     
     await product.delete()
     return {"message": "Product Removed"}
+
+
+@router.post("/")
+async def createProduct(product: Product, user=Depends(require_role("admin"))):
+    await product.insert()
+    return product
 
 
 def get_search_params(
@@ -74,3 +81,15 @@ def get_search_params(
 @router.get("/search")
 async def searchProducts(params: ProductSearchParams = Depends(get_search_params)):
     return await searchProductsService(params)
+
+@router.get("/categories")
+async def getAllCategories():
+    return await get_all_categories()
+
+
+@router.get("/{product_id}")
+async def getProductById(product_id: str):
+    product = await Product.get(product_id)
+    if not product:
+        raise HTTPException(404, "Product not found")
+    return {"product": product} 

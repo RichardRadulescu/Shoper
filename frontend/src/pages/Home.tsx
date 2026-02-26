@@ -33,8 +33,6 @@ const productsData: Array<Product> = [
 ];
 
 
-const THE_URL = "http://localhost:8000/products/search"
-
 export default function Home(){
     const [showFilters, setShowFilters] = useState(false);
     //const products = useMemo(() => productsData, []);
@@ -53,7 +51,7 @@ export default function Home(){
     const max = params.get("max");
 
     useEffect(()=>{
-        const url = new URL(THE_URL); 
+        const url = new URL("http://localhost:8000/api/products/search"); 
         if (query) url.searchParams.set("query", query); 
         if (categoriesParam) url.searchParams.set("categories", categoriesParam);
         if (sort) url.searchParams.set("orderBy", sort);
