@@ -6,7 +6,7 @@ export default function App(){
     return (
         <div className={styles.app}>
         <Navbar>
-            <h1>Hello</h1>
+            <h1>Welcome to Shoper</h1>
         </Navbar>
         <Outlet />
         </div>

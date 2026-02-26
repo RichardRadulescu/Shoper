@@ -1,14 +1,16 @@
-import { createBrowserRouter } from 'react-router-dom'
-import Home from './pages/Home'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import App from './App'
 import AdminControls from './pages/AdminControls'
+import Products from './pages/Products'
+
 
 export const router= createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
-      {path:"products", element: <Home/>},
+      {index: true, element: <Navigate to="/products" replace/>},
+      {path:"products", element: <Products/>},
       {path:"admin", element: <AdminControls/>}, 
     ]
 

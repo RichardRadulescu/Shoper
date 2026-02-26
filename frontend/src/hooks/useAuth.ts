@@ -13,6 +13,7 @@ export function useAuth() {
     const logout = useCallback(async () => {
         await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
         dispatch(clearRole());
+        dispatch(clear)
     }, [dispatch]);
 
     const login = useCallback(
