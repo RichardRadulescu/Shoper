@@ -8,7 +8,7 @@ export default function ProductListModal({products}: {products: Array<Product>})
         <ul className={styles.list}>
             {products.map( (p,i)=> <li key={i }>
                 <p> {p.title}</p>
-                <p> {p.price}</p>
+                <p> {p.price}</p>                
             </li>)}
         </ul>
         

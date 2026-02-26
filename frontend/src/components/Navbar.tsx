@@ -1,7 +1,7 @@
 import { useState, type PropsWithChildren, useEffect, type SyntheticEvent } from "react";
 import useAuth from "../hooks/useAuth";
 import useFavorites from "../hooks/useFavorites";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import ProductListModal from "./ProductListModal";
 import ThemeToggle from "./ThemeToggle";
 import LoginModal from "./LoginModal";
@@ -9,8 +9,9 @@ import styles from "../styles/Navbar.module.css";
 import RegisterModal from "./RegisterModal";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store/store";
-import { fetchCart } from "../slices/cartSlice";
+import { clearCart, fetchCart } from "../slices/cartSlice";
 import { type AppDispatch } from "../store/store";
+import { useFavoritesContext } from "../hooks/useFavoritesContext";
 
 
 
@@ -28,14 +29,18 @@ export default function Navbar({ children }: PropsWithChildren) {
   const [params, setParams] = useSearchParams();
   const [search, setSearch] = useState(() => params.get("query") ?? "");
   // PRODUCT LISTS
-  const { items: favItems } = useFavorites();
+  const { items: favItems } = useFavoritesContext();
   const cartProducts=  useSelector((s: RootState)=> s.cart.products) 
   const cartItems= useSelector((s: RootState)=> s.cart.items)
   const dispatch= useDispatch<AppDispatch>()
 
+  const navigate= useNavigate();
+
   useEffect(()=>{
     if (role === "user")
      dispatch(fetchCart({userId: id}))
+    else
+      dispatch(clearCart()) 
   
   },[id, role, dispatch] )
 
@@ -58,7 +63,7 @@ export default function Navbar({ children }: PropsWithChildren) {
       <nav className={styles.navbar}>
         <div className={styles.left}>
           <a className={styles.logo} href="/">
-            MyShop
+            Shoper
           </a>
         </div>
         <form className={styles.searchWrap} onSubmit={handleSubmit}>
@@ -73,12 +78,14 @@ export default function Navbar({ children }: PropsWithChildren) {
           />
           </label>
           <button type="submit">Go</button>
-        </Form>
+        </form>
 
         <div className={styles.right}>
           <button onClick={() => setShowFavs((v) => !v)}>Favorites ({favItems.length})</button>
-          <button onClick={() => setShowCart((v) => !v)}>Cart ({cartItems.length})</button>
-          {role === "admin" && <button>Admin</button>}
+          { role === "user" &&
+           <button onClick={() => setShowCart((v) => !v)}>Cart ({cartItems.length})</button>
+          }
+          {role === "admin" && <button onClick={()=> navigate("/admin")}>Admin</button>}
           {!isLoggedIn ? (
             <>
             <button onClick={() => setShowLogin((v) => !v)}>Login</button>

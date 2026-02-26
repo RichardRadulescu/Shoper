@@ -16,7 +16,9 @@ export default function useFavorites() {
     useEffect(() => {
         try {
             localStorage.setItem(KEY, JSON.stringify(items));
-        } catch { }
+        } catch {
+            console.log("could not write to storage")
+        }
     }, [items]);
 
     const isFavorite = useCallback(
