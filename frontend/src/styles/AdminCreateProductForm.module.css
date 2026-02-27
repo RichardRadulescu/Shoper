@@ -64,5 +64,5 @@
 
 .message {
     font-size: 0.9rem;
-    color: var(--success, #008000);
+    color: var(--success, #000000);
 }

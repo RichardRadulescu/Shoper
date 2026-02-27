@@ -1,6 +1,5 @@
 import { useState, type PropsWithChildren, useEffect, type SyntheticEvent } from "react";
 import useAuth from "../hooks/useAuth";
-import useFavorites from "../hooks/useFavorites";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ProductListModal from "./ProductListModal";
 import ThemeToggle from "./ThemeToggle";
@@ -9,9 +8,10 @@ import styles from "../styles/Navbar.module.css";
 import RegisterModal from "./RegisterModal";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store/store";
-import { clearCart, fetchCart } from "../slices/cartSlice";
+import { clearCart, fetchCart, removeFromCart } from "../slices/cartSlice";
 import { type AppDispatch } from "../store/store";
 import { useFavoritesContext } from "../hooks/useFavoritesContext";
+import type { Product } from "../types/Product";
 
 
 
@@ -29,7 +29,7 @@ export default function Navbar({ children }: PropsWithChildren) {
   const [params, setParams] = useSearchParams();
   const [search, setSearch] = useState(() => params.get("query") ?? "");
   // PRODUCT LISTS
-  const { items: favItems } = useFavoritesContext();
+  const { items: favItems, remove } = useFavoritesContext();
   const cartProducts=  useSelector((s: RootState)=> s.cart.products) 
   const cartItems= useSelector((s: RootState)=> s.cart.items)
   const dispatch= useDispatch<AppDispatch>()
@@ -81,7 +81,10 @@ export default function Navbar({ children }: PropsWithChildren) {
         </form>
 
         <div className={styles.right}>
-          <button onClick={() => setShowFavs((v) => !v)}>Favorites ({favItems.length})</button>
+          {
+            role !== "admin" &&
+            <button onClick={() => setShowFavs((v) => !v)}>Favorites ({favItems.length})</button>
+          }
           { role === "user" &&
            <button onClick={() => setShowCart((v) => !v)}>Cart ({cartItems.length})</button>
           }
@@ -123,7 +126,7 @@ export default function Navbar({ children }: PropsWithChildren) {
             {!isLoggedIn ? (
               <button onClick={() => setShowLogin(true)}>Login</button>
             ) : (
-              <button onClick={() => console.log("logout")}>Logout</button>
+              <button onClick={logout}>Logout</button>
             )}
           </div>
         </div>
@@ -132,7 +135,8 @@ export default function Navbar({ children }: PropsWithChildren) {
       {showCart && (
         <div className={styles.modal}>
           <h2>Cart</h2>
-          <ProductListModal products={cartProducts}></ProductListModal>
+          <ProductListModal products={cartProducts} 
+            onRemove={(prodId)=>{dispatch(removeFromCart({userId: id, productId: prodId as string}))}}></ProductListModal>
           <button onClick={() => setShowCart(false)}>Close</button>
         </div>
       )}
@@ -140,7 +144,7 @@ export default function Navbar({ children }: PropsWithChildren) {
       {showFavs && (
         <div className={styles.modal}>
           <h2>Favorites</h2>
-          <ProductListModal products={favItems}></ProductListModal>
+          <ProductListModal products={favItems} onRemove={(prod)=>remove(prod as Product )}></ProductListModal>
           <button onClick={() => setShowFavs(false)}>Close</button>
         </div>
       )}

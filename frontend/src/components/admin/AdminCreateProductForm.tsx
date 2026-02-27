@@ -34,6 +34,7 @@ export default function AdminCreateProductForm({ onCreated }: CreateProductFormP
     const res = await fetch("/api/products", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify(payload),
     });
 
