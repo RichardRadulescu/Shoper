@@ -19,7 +19,7 @@ export const addToCart = createAsyncThunk(
             if (!res.ok) return rejectWithValue("Failed to add to cart");
 
             // refresh cart after successful add
-            await dispatch(fetchCart(userId));
+            await dispatch(fetchCart({ userId }));
 
             return true;
         } catch (err) {

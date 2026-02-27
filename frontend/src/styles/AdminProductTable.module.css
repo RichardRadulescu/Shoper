@@ -83,3 +83,13 @@
     background: var(--bg);
     color: var(--text);
 }
+
+@media (max-width: 400px) {
+    .filters {
+        flex-direction: column;
+    }
+
+    .table {
+        width: auto;
+    }
+}
