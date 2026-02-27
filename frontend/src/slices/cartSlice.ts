@@ -43,7 +43,7 @@ export const removeFromCart = createAsyncThunk(
             if (!res.ok) return rejectWithValue("Failed to remove from cart");
 
             // refresh cart after successful removal
-            await dispatch(fetchCart(userId));
+            await dispatch(fetchCart({ userId }));
 
             return true;
         } catch (err) {
